@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SpaceBase Presentation Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: SpaceBase3000 house style (spacebase.se). Dark-only by brand choice: near-black ground, Space Mono throughout, signal red with gradient buttons. Form on the left, live tally pinned on the right; stacks on phones. */
+:root{
+  --bg:#08080a; --bg2:#0d0d10; --bg3:#121217; --panel:#131318;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12); --border3:rgba(255,255,255,0.16);
+  --text:#ededf2; --dim:#9a9aa8; --faint:#5c5c6a;
+  --red:#cf0a1e; --red-bright:#f0293a; --red-deep:#5e030f; --red-soft:rgba(207,10,30,0.15); --red-glow:rgba(207,10,30,0.5);
+  --mono:'Space Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15px;line-height:1.6;padding:0 16px}
+[hidden]{display:none!important}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 40px}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red-bright);outline-offset:2px}
+::selection{background:var(--red);color:#fff}
+
+.topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.brand{font-weight:700;font-size:19px;letter-spacing:-0.02em}
+.brand i{font-style:normal;color:var(--red)}
+.brand span{color:var(--faint);font-weight:400;font-size:13px;margin-left:10px;letter-spacing:0}
+.status{display:flex;align-items:center;gap:8px;font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:var(--faint)}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.status[data-s="live"]{color:var(--dim)}
+.status[data-s="live"]::before{background:var(--red-bright);box-shadow:0 0 10px var(--red-glow);animation:pulse 2.4s var(--ease) infinite}
+.status[data-s="off"]::before{background:var(--red-deep)}
+@keyframes pulse{50%{opacity:.35}}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:40px;margin-top:36px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr;gap:32px}}
+
+.eyebrow{font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--red)}
+h1{font-weight:700;font-size:clamp(30px,5vw,44.8px);line-height:1.1;letter-spacing:-0.03em;margin:10px 0 8px;text-wrap:balance}
+.sub{font-size:13px;color:var(--dim);min-height:1.6em}
+.lead{color:var(--dim);max-width:60ch;margin:14px 0 0;font-size:14.5px}
+
+.session{display:grid;grid-template-columns:1fr 1fr 160px;gap:14px;margin-top:28px;padding:18px;background:var(--bg2);border:1px solid var(--border);border-radius:14px}
+@media (max-width:560px){.session{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lbl{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+input[type=text],input[type=date],textarea{width:100%;background:var(--bg3);border:1px solid var(--border3);border-radius:11px;padding:10px 12px;font-size:14px;transition:border-color .2s var(--ease)}
+input[type=text]::placeholder,textarea::placeholder{color:var(--faint)}
+input[type=text]:focus,input[type=date]:focus,textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft)}
+textarea{min-height:84px;resize:vertical}
+.check{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--dim)}
+.check input{margin-top:4px;accent-color:var(--red)}
+
+form ol{list-style:none;padding:0;margin:24px 0 0;display:flex;flex-direction:column}
+.q{display:grid;grid-template-columns:44px minmax(0,1fr);gap:6px 12px;padding:20px 0;border-top:1px solid var(--border)}
+.q .n{font-size:12px;color:var(--red);padding-top:3px;letter-spacing:.05em}
+.q .t{font-weight:700;font-size:15px}
+.q .t small{font-weight:400;color:var(--faint);font-size:11.5px;margin-left:8px}
+.q .body{grid-column:2}
+.q.err .t{color:var(--red-bright)}
+
+.scale{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.scale .end{font-size:11.5px;color:var(--faint);width:72px}
+.scale .end:last-child{text-align:right}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{display:inline-grid;place-items:center;min-width:44px;height:42px;padding:0 12px;border:1px solid var(--border2);border-radius:9px;background:rgba(255,255,255,0.03);cursor:pointer;font-size:14px;font-weight:700;transition:border-color .2s var(--ease),background .2s var(--ease)}
+.seg label:hover{border-color:var(--red)}
+.seg input:checked + label{background:linear-gradient(135deg,var(--red),var(--red-deep));border-color:transparent;color:#fff;box-shadow:0 6px 20px var(--red-soft)}
+.seg input:focus-visible + label{outline:2px solid var(--red-bright);outline-offset:2px}
+.seg.words label{font-size:13px;font-weight:400}
+.seg.words input:checked + label{font-weight:700}
+@media (max-width:440px){.scale .end{width:auto}.seg label{min-width:38px;padding:0 9px}}
+
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding-top:22px;border-top:1px solid var(--border)}
+.btn{background:linear-gradient(135deg,var(--red),var(--red-deep));color:#fff;border:1px solid transparent;border-radius:11px;padding:14px 28px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 10px 30px var(--red-soft);transition:box-shadow .3s var(--ease),transform .3s var(--ease)}
+.btn:hover{box-shadow:0 10px 30px var(--red-glow);transform:translateY(-1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:rgba(255,255,255,0.03);border-color:var(--border2);color:var(--text);box-shadow:none}
+.btn.ghost:hover{border-color:var(--red)}
+.note{font-size:12.5px;color:var(--faint)}
+.note.bad{color:var(--red-bright)}
+
+.thanks{margin-top:28px;padding:28px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;position:relative;overflow:hidden}
+.thanks::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,var(--red),transparent)}
+.thanks h2{font-weight:700;font-size:24px;letter-spacing:-0.02em;margin:0 0 8px}
+.thanks p{margin:0 0 18px;color:var(--dim);max-width:56ch;font-size:14px}
+
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:22px;background-image:radial-gradient(ellipse at top right,var(--red-soft),transparent 55%)}
+@media (max-width:860px){aside{position:static}}
+.tag{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.22em}
+.tag span:first-child{color:var(--red)}
+.big{display:flex;align-items:baseline;gap:10px}
+.big b{font-weight:700;font-size:68px;line-height:1;letter-spacing:-0.05em;font-variant-numeric:tabular-nums}
+.big span{color:var(--dim);font-size:13px}
+.dist{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.drow{display:grid;grid-template-columns:16px minmax(0,1fr) 28px;gap:10px;align-items:center;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red-deep),var(--red-bright));border-radius:3px;width:0;transition:width .5s var(--ease)}
+.drow span:last-child{text-align:right;color:var(--dim)}
+.empty{padding:14px 16px;border:1px dashed var(--border2);border-radius:11px;color:var(--dim);font-size:13px}
+.empty strong{color:var(--text);display:block}
+.h3{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin:0 0 10px;padding-top:18px;border-top:1px solid var(--border)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mini b{font-size:30px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+.mini b small{font-size:12px;font-weight:400;color:var(--faint);letter-spacing:0}
+.mini div{font-size:12px;color:var(--dim)}
+.stack{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--bg3);margin:8px 0 6px}
+.stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;background:var(--c)}
+.c1{--c:var(--dim)}.c2{--c:var(--red)}.c3{--c:var(--faint)}
+.comments{display:flex;flex-direction:column;gap:14px;max-height:420px;overflow:auto}
+.cm{font-size:13.5px;display:flex;flex-direction:column;gap:4px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.cm:last-child{border-bottom:0}
+.cm p{margin:0 0 4px;min-width:0;overflow-wrap:anywhere;color:var(--text)}
+.cm .k{font-size:10px;text-transform:uppercase;letter-spacing:.2em}
+.cm .k.good{color:var(--dim)}.cm .k.fix{color:var(--red-bright)}
+.cm .who{font-size:11.5px;color:var(--faint)}
+footer{margin-top:40px;padding:16px 0 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11.5px;color:var(--faint)}
+footer b{color:var(--dim)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand">SpaceBase<i>3000</i><span>/ Staff feedback</span></div>
+    <div class="status" id="status" data-s="wait">Connecting</div>
+  </header>
+
+  <div class="grid">
+    <main>
+      <div class="eyebrow">Presentation review</div>
+      <h1 id="heading">Staff presentation</h1>
+      <div class="sub" id="subline">&nbsp;</div>
+      <p class="lead">Two minutes, anonymous unless you sign it. Your answers feed the live tally so the team knows what to keep and what to change next time.</p>
+
+      <form id="form" novalidate>
+        <div class="session">
+          <div class="field"><label for="title">Presentation title</label><input type="text" id="title" autocomplete="off" placeholder="e.g. Q4 roadmap walkthrough"></div>
+          <div class="field"><label for="presenter">Presenter</label><input type="text" id="presenter" autocomplete="off" placeholder="Who presented"></div>
+          <div class="field"><label for="date">Date held</label><input type="date" id="date"></div>
+          <label class="check" for="newround"><input type="checkbox" id="newround"><span>Start a new round. Existing reviews stay stored but the tally resets for this presentation.</span></label>
+        </div>
+
+        <ol>
+          <li class="q" id="q-overall"><span class="n">01</span><span class="t">Overall, how was the presentation?</span>
+            <div class="body scale"><span class="end">Poor</span><div class="seg" data-name="overall"></div><span class="end">Excellent</span></div></li>
+          <li class="q"><span class="n">02</span><span class="t">The content was relevant and useful to my work</span>
+            <div class="body scale"><span class="end">Disagree</span><div class="seg" data-name="content"></div><span class="end">Agree</span></div></li>
+          <li class="q"><span class="n">03</span><span class="t">The delivery was clear and engaging</span>
+            <div class="body scale"><span class="end">Disagree</span><div class="seg" data-name="delivery"></div><span class="end">Agree</span></div></li>
+          <li class="q"><span class="n">04</span><span class="t">How was the length?</span>
+            <div class="body scale"><div class="seg words" data-name="length" data-opts="Too short|About right|Too long"></div></div></li>
+          <li class="q"><span class="n">05</span><span class="t">Would you want more sessions like this?</span>
+            <div class="body scale"><div class="seg words" data-name="more" data-opts="Yes|Maybe|No"></div></div></li>
+          <li class="q"><span class="n">06</span><label class="t" for="good">What worked well?<small>optional</small></label>
+            <div class="body"><textarea id="good" maxlength="1200"></textarea></div></li>
+          <li class="q"><span class="n">07</span><label class="t" for="better">What could be better next time?<small>optional</small></label>
+            <div class="body"><textarea id="better" maxlength="1200"></textarea></div></li>
+          <li class="q"><span class="n">08</span><label class="t" for="name">Your name<small>optional, blank stays anonymous</small></label>
+            <div class="body"><input type="text" id="name" maxlength="80" autocomplete="off"></div></li>
+        </ol>
+
+        <div class="actions">
+          <button class="btn" id="submit" type="submit">Send review</button>
+          <span class="note" id="formnote">Only question 01 is required.</span>
+        </div>
+      </form>
+
+      <section class="thanks" id="thanks" hidden>
+        <h2>Thanks, your review is in.</h2>
+        <p>It's already counted in the tally. You can change your answers any time; the update replaces your earlier review rather than adding a second one.</p>
+        <button class="btn ghost" id="edit" type="button">Change my answers</button>
+      </section>
+    </main>
+
+    <aside aria-live="polite">
+      <div class="tag"><span>Live tally</span><span id="count">0 responses</span></div>
+      <div>
+        <div class="big"><b id="avg">–</b><span>/ 5 overall</span></div>
+        <div class="dist" id="dist"></div>
+      </div>
+      <div class="empty" id="emptybox"><strong>No reviews yet.</strong>Yours will be the first data point.</div>
+
+      <div>
+        <div class="h3">Breakdown</div>
+        <div class="pair">
+          <div class="mini"><div>Content</div><b id="avgC">–<small> / 5</small></b></div>
+          <div class="mini"><div>Delivery</div><b id="avgD">–<small> / 5</small></b></div>
+        </div>
+      </div>
+      <div>
+        <div class="lbl">Length</div>
+        <div class="stack" id="lenbar"></div>
+        <div class="legend" id="lenleg"></div>
+      </div>
+      <div>
+        <div class="lbl">Want more sessions</div>
+        <div class="stack" id="morebar"></div>
+        <div class="legend" id="moreleg"></div>
+      </div>
+      <div>
+        <div class="h3">In their words</div>
+        <div class="comments" id="comments"><div class="note">Comments appear here as colleagues submit them, newest first.</div></div>
+      </div>
+    </aside>
+  </div>
+
+  <footer><span><b>SpaceBase3000</b> · It's not Magic, it's Data</span><span>Answers are stored on this server</span></footer>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const SURVEY = "presentation-review";
+  const API = "/api";
+  const POLL_MS = 5000;
+  const LEN = ["Too short","About right","Too long"], MORE = ["Yes","Maybe","No"];
+
+  // Build the segmented scales
+  document.querySelectorAll(".seg").forEach(seg => {
+    const name = seg.dataset.name;
+    const opts = seg.dataset.opts ? seg.dataset.opts.split("|") : ["1","2","3","4","5"];
+    opts.forEach((v,i) => {
+      const id = name + "-" + i;
+      const inp = document.createElement("input");
+      inp.type = "radio"; inp.name = name; inp.id = id; inp.value = v;
+      const lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = v;
+      seg.append(inp, lab);
+    });
+  });
+
+  // A random id this browser keeps, so a resubmit replaces the earlier answers
+  let token = null;
+  try { token = localStorage.getItem("sb_respondent"); } catch(e){}
+  if (!token || !/^[A-Za-z0-9_-]{16,128}$/.test(token)){
+    token = (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2))).replace(/-/g, "");
+    try { localStorage.setItem("sb_respondent", token); } catch(e){}
+  }
+
+  let round = null, mine = null, dirtyMeta = false, busy = false, online = false;
+  const status = (s, t) => { const el = $("#status"); el.dataset.s = s; el.textContent = t; };
+  const pick = n => { const c = document.querySelector('input[name="'+n+'"]:checked'); return c ? c.value : null; };
+  const setPick = (n, v) => { document.querySelectorAll('input[name="'+n+'"]').forEach(i => { i.checked = (v != null && i.value === String(v)); }); };
+  ["title","presenter","date"].forEach(id => $("#"+id).addEventListener("input", () => { dirtyMeta = true; }));
+
+  async function api(method, path, body){
+    const res = await fetch(API + path, {
+      method, headers: body ? {"Content-Type": "application/json"} : {},
+      body: body ? JSON.stringify(body) : undefined, cache: "no-store"
+    });
+    let data = null; try { data = await res.json(); } catch(e){}
+    if (!res.ok){ const err = new Error((data && data.detail) || res.statusText); err.status = res.status; throw err; }
+    return data;
+  }
+
+  function fmtDate(d){
+    if (!d) return "";
+    try { return new Date(d + "T12:00:00").toLocaleDateString(undefined, {day:"numeric", month:"short", year:"numeric"}); } catch(e){ return d; }
+  }
+
+  function showRoundMeta(){
+    $("#heading").textContent = (round && round.title) || "Staff presentation";
+    const bits = [];
+    if (round && round.presenter) bits.push("Presented by " + round.presenter);
+    if (round && round.held_on) bits.push(fmtDate(round.held_on));
+    $("#subline").textContent = bits.join(" · ") || " ";
+    if (!dirtyMeta){
+      $("#title").value = (round && round.title) || "";
+      $("#presenter").value = (round && round.presenter) || "";
+      $("#date").value = (round && round.held_on) || "";
+    }
+  }
+
+  function fillFromMine(){
+    if (!mine) return false;
+    const a = mine.answers || {};
+    setPick("overall", a.overall); setPick("content", a.content); setPick("delivery", a.delivery);
+    setPick("length", a.length); setPick("more", a.more);
+    $("#good").value = a.good || ""; $("#better").value = a.better || ""; $("#name").value = a.name || "";
+    $("#submit").textContent = "Update review";
+    return true;
+  }
+
+  function clearForm(){
+    ["overall","content","delivery","length","more"].forEach(n => setPick(n, null));
+    $("#good").value = ""; $("#better").value = ""; $("#name").value = "";
+    $("#submit").textContent = "Send review";
+  }
+
+  function f1(x){ return x == null ? "–" : Number(x).toFixed(1); }
+
+  function stack(barId, legId, labels, counts){
+    const total = counts.reduce((a,b)=>a+b,0), bar = $(barId), leg = $(legId);
+    bar.replaceChildren(); leg.replaceChildren();
+    labels.forEach((l,i) => {
+      const cls = ["c2","c1","c3"][i];
+      if (total){ const s = document.createElement("i"); s.className = cls; s.style.background = "var(--c)"; s.style.width = (counts[i]/total*100) + "%"; bar.append(s); }
+      const g = document.createElement("span"); g.className = cls; g.textContent = l + " " + counts[i]; leg.append(g);
+    });
+  }
+
+  function render(sum){
+    const q = (sum && sum.questions) || {};
+    const n = (sum && sum.responses) || 0;
+    $("#count").textContent = n + (n === 1 ? " response" : " responses");
+    $("#emptybox").hidden = n > 0;
+    const ov = q.overall || {distribution:{}};
+    $("#avg").textContent = f1(ov.average);
+    const dist = $("#dist"); dist.replaceChildren();
+    const counts = [1,2,3,4,5].map(k => (ov.distribution || {})[k] || 0);
+    const max = Math.max(1, ...counts);
+    [5,4,3,2,1].forEach(k => {
+      const c = counts[k-1];
+      const row = document.createElement("div"); row.className = "drow";
+      const a = document.createElement("span"); a.textContent = k;
+      const bar = document.createElement("div"); bar.className = "bar"; const fill = document.createElement("i"); fill.style.width = (c/max*100) + "%"; bar.append(fill);
+      const b = document.createElement("span"); b.textContent = c;
+      row.append(a, bar, b); dist.append(row);
+    });
+    $("#avgC").firstChild.nodeValue = f1(q.content && q.content.average);
+    $("#avgD").firstChild.nodeValue = f1(q.delivery && q.delivery.average);
+    stack("#lenbar", "#lenleg", LEN, LEN.map(l => ((q.length || {}).counts || {})[l] || 0));
+    stack("#morebar", "#moreleg", MORE, MORE.map(l => ((q.more || {}).counts || {})[l] || 0));
+
+    const box = $("#comments"); box.replaceChildren();
+    const list = (sum && sum.comments) || [];
+    if (!list.length){
+      const p = document.createElement("div"); p.className = "note"; p.textContent = "Comments appear here as colleagues submit them, newest first."; box.append(p);
+    }
+    list.forEach(r => {
+      const c = document.createElement("div"); c.className = "cm";
+      [["good","Worked well","good"],["better","Could be better","fix"]].forEach(([f,lab,cls]) => {
+        const t = r.answers && r.answers[f];
+        if (t){
+          const k = document.createElement("span"); k.className = "k " + cls; k.textContent = lab;
+          const p = document.createElement("p"); p.textContent = t;
+          c.append(k, p);
+        }
+      });
+      const w = document.createElement("span"); w.className = "who";
+      let when = ""; try { when = new Date(r.updated_at).toLocaleDateString(undefined,{day:"numeric",month:"short"}); } catch(e){}
+      w.textContent = (r.name || "Anonymous") + (when ? " · " + when : "") + (r.overall ? " · " + r.overall + "/5" : "");
+      c.append(w); box.append(c);
+    });
+  }
+
+  async function loadMine(){
+    mine = null;
+    if (!round) return;
+    try { mine = await api("GET", "/sessions/" + round.id + "/responses/" + token); } catch(e){ mine = null; }
+    if (mine && !$("#form").hidden) fillFromMine();
+  }
+
+  async function refresh(){
+    try {
+      let next = null;
+      try { next = await api("GET", "/surveys/" + SURVEY + "/sessions/current"); }
+      catch(e){ if (e.status !== 404) throw e; }
+      const changed = (round && round.id) !== (next && next.id);
+      round = next;
+      showRoundMeta();
+      if (changed){ clearForm(); $("#thanks").hidden = true; $("#form").hidden = false; await loadMine(); }
+      render(round ? await api("GET", "/sessions/" + round.id + "/summary") : null);
+      if (!online){ online = true; status("live", "Live"); }
+    } catch(e){
+      online = false; status("off", "Offline");
+    }
+  }
+
+  $("#form").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    if (busy) return;
+    const overall = pick("overall");
+    const note = $("#formnote");
+    if (!overall){
+      $("#q-overall").classList.add("err"); note.textContent = "Pick a score for question 01 to send your review."; note.classList.add("bad");
+      $("#q-overall").scrollIntoView({behavior:"smooth", block:"center"}); return;
+    }
+    $("#q-overall").classList.remove("err"); note.classList.remove("bad");
+    busy = true; $("#submit").disabled = true; note.textContent = "Sending…";
+    const meta = {
+      title: $("#title").value.trim() || "Staff presentation",
+      presenter: $("#presenter").value.trim(),
+      held_on: $("#date").value || null
+    };
+    try {
+      if (!round || $("#newround").checked){
+        round = await api("POST", "/surveys/" + SURVEY + "/sessions", meta);
+        mine = null;
+      } else if (meta.title !== (round.title || "") || meta.presenter !== (round.presenter || "") || meta.held_on !== (round.held_on || null)){
+        round = await api("PATCH", "/sessions/" + round.id, meta);
+      }
+      showRoundMeta();
+      dirtyMeta = false; $("#newround").checked = false;
+      const answers = { overall: +overall };
+      if (pick("content")) answers.content = +pick("content");
+      if (pick("delivery")) answers.delivery = +pick("delivery");
+      if (pick("length")) answers.length = pick("length");
+      if (pick("more")) answers.more = pick("more");
+      ["good","better","name"].forEach(f => { const v = $("#"+f).value.trim(); if (v) answers[f] = v; });
+      mine = await api("PUT", "/sessions/" + round.id + "/responses/" + token, { answers });
+      $("#form").hidden = true; $("#thanks").hidden = false;
+      note.textContent = "Only question 01 is required.";
+      $("#submit").textContent = "Update review";
+      render(await api("GET", "/sessions/" + round.id + "/summary"));
+    } catch(e){
+      note.classList.add("bad");
+      note.textContent = e.status === 409 ? "This round is closed, so it no longer takes answers."
+        : e.status === 422 ? "Some answers weren't accepted: " + e.message
+        : e.status === 401 || e.status === 403 ? "Only an admin can start or change a round on this server."
+        : "Couldn't send your review. Check your connection and try again.";
+    } finally { busy = false; $("#submit").disabled = false; }
+  });
+
+  $("#edit").addEventListener("click", () => {
+    $("#thanks").hidden = true; $("#form").hidden = false; fillFromMine();
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+
+  render(null);
+  refresh();
+  setInterval(() => { if (!document.hidden) refresh(); }, POLL_MS);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+})();
+</script>
+</body>
+</html>
